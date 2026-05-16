@@ -5,6 +5,9 @@ function Reservations() {
 
     const [reservations, setReservations] = useState([]);
 
+    // GET USER FROM LOCAL STORAGE
+    const user = JSON.parse(localStorage.getItem("user"));
+
     useEffect(() => {
         loadReservations();
     }, []);
@@ -20,6 +23,44 @@ function Reservations() {
         } catch (err) {
 
             console.log(err);
+        }
+    };
+
+    // APPROVE
+    const approveReservation = async (id) => {
+
+        try {
+
+            await API.put(`/reservations/${id}/approve`);
+
+            alert("Reservation approved");
+
+            loadReservations();
+
+        } catch (err) {
+
+            console.log(err);
+
+            alert("Approve failed");
+        }
+    };
+
+    // REJECT
+    const rejectReservation = async (id) => {
+
+        try {
+
+            await API.put(`/reservations/${id}/reject`);
+
+            alert("Reservation rejected");
+
+            loadReservations();
+
+        } catch (err) {
+
+            console.log(err);
+
+            alert("Reject failed");
         }
     };
 
@@ -49,10 +90,39 @@ function Reservations() {
 
                     <p>Status: {reservation.status}</p>
 
-                    <p>Event Date:
+                    <p>
+                        Event Date:
                         {" "}
-                        {new Date(reservation.event_date).toLocaleDateString()}
+                        {new Date(
+                            reservation.event_date
+                        ).toLocaleDateString()}
                     </p>
+
+                    {/* ADMIN BUTTONS */}
+                    {user?.role === "admin" && (
+
+                        <div style={{ marginTop: 10 }}>
+
+                            <button
+                                onClick={() =>
+                                    approveReservation(reservation.id)
+                                }
+                            >
+                                Approve
+                            </button>
+
+                            {" "}
+
+                            <button
+                                onClick={() =>
+                                    rejectReservation(reservation.id)
+                                }
+                            >
+                                Reject
+                            </button>
+
+                        </div>
+                    )}
 
                 </div>
             ))}
